@@ -1,14 +1,19 @@
 Package: picolaModel
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Title: Thermal Time Phenology Model for Lodgepole Pine
+Version: 1.0.0
+Author: C. Susannah Tysor
+Maintainer: C. Susannah Tysor <susannah@pobox.com>
+Description: Hierarchical Bayesian thermal time model predicting pollen shed
+    and cone receptivity of lodgepole pine (*Pinus contorta* ssp. *latifolia*).
+    Uses Stan via the 'brms' package. Data is based on 'scisus/picolaDataFlowering'
+    and 'scisus/picolaDataClimate' packages. Includes diagnostic, output analysis
+    and visualization post-processing scripts.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.3)
 Suggests:
     picolaDataFlowering,
     picolaDataClimate,
@@ -24,7 +29,34 @@ Suggests:
     rstan,
     brms,
     assertthat,
+    tidybayes,
+    forcats,
+    future,
+    furrr,
+    geosphere,
+    broom,
+    ggdist,
+    viridis,
+    ggbeeswarm,
+    patchwork,
+    ggokabeito,
+    ggrepel,
+    cols4all,
+    ggh4x,
+    optparse,
+    sf,
+    rnaturalearth,
+    rnaturalearthdata,
+    rnaturalearthhires,
+    ggspatial,
+    terra,
+    elevatr,
+    corrr,
+    devtools,
+    knitr,
+    rmarkdown
 Remotes:
-    local::../picolaDataFlowering,
-    local::../picolaDataClimate
+    scisus/picolaDataFlowering,
+    scisus/picolaDataClimate,
+    ropensci/rnaturalearthhires
 LazyData: true

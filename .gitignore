@@ -1,0 +1,7 @@
+*.pdf
+model/stan_output/
+model/modells.rds
+.Rproj*
+.Rhist*
+Rplots.pdf
+.Rproj.user
