@@ -41,6 +41,12 @@ argument to the prediction function.
 
 ## Example use
 
+``` r
+# install model object from Zenodo
+modells <- readRDS(here::here("model/modells.rds")) # Download from 10.5281/zenodo.14597582 a.k.a. https://zenodo.org/records/14597582
+nsamp <- 6000 # downsample
+```
+
 ### Predict grand mean
 
 Calculate the model expectation for MATs of -5 to 5 degrees. This is the
@@ -165,6 +171,6 @@ practical guides on predicting from Bayesian models using `brms` and
 - [the differences between posterior predictions, the expectation of the
   posterior predictive distribution, and the posterior of the linear
   predictor](https://www.andrewheiss.com/blog/2022/09/26/guide-visualizing-types-posteriors/).
-- predictions from a mulitilevel Bayesian model with \[an especially
+- predictions from a mulitilevel Bayesian model with [an especially
   useful table describing how function arguments relate to prediction
-  goals\]((<https://www.andrewheiss.com/blog/2021/11/10/ame-bayes-re-guide/#overall-summary-of-different-approaches>).
+  goals](https://www.andrewheiss.com/blog/2021/11/10/ame-bayes-re-guide/#overall-summary-of-different-approaches).

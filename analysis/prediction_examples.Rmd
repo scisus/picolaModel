@@ -35,9 +35,10 @@ library(dplyr)
 library(purrr)
 library(tidybayes)
 library(ggplot2)
-
+```
+```{r modelobj}
 # install model object from Zenodo
-modells <- readRDS(here::here("model/modells.rds")) # update this to download from zenodo
+modells <- readRDS(here::here("model/modells.rds")) # Download from 10.5281/zenodo.14597582 a.k.a. https://zenodo.org/records/14597582
 nsamp <- 6000 # downsample
 ```
 
