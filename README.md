@@ -1,6 +1,7 @@
 # picolaModel
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/scisus/picolaModel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/scisus/picolaModel/actions/workflows/R-CMD-check.yaml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14597656.svg)](https://doi.org/10.5281/zenodo.14597656)
 <!-- badges: end -->
 
 This repository contains code to fit a multilevel Bayesian thermal time model
