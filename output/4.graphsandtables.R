@@ -12,6 +12,7 @@ library(ggokabeito)   # Neat accessible color palette
 library(tidyr)
 library(ggrepel)
 library(cols4all)
+library(ggh4x)
 
 #section headings match fig references/chunk names in paper
 factororder <- readRDS(here::here("output/factororder.rds")) # site names in order from coldest to warmest MAT
@@ -468,7 +469,7 @@ phenf_orchplot_kalpgtis_expanded <- rbind(
   transform(phenf_orchplot_kalpgtis, MAT_label = "Provenance MAT: 6.8 °C")
 )
 
-library(ggh4x)
+
 ggplot() +
   geom_ribbon(data = doy_annual_avg_pp_sum_kalpgtis,
               aes(x = Year, ymin = .lower, ymax = .upper, group = event, fill = event), alpha = 0.3) +
@@ -492,6 +493,54 @@ ggplot() +
 
 ggsave(here::here("output/figures/orchpred_doy_vertical.png"), width = 5, height = 8)
 
+### horizontal versions for presentation ###############
+
+pgtisorch <- ggplot() +
+    geom_line(data = filter(phenf_orchplot, Site == "PGTIS"), aes(x = Year, y = DoY, group = Year), alpha = 0.9) +
+    geom_ribbon(data = filter(doy_annual_avg_pp_sum, Site == "PGTIS"), aes(x = Year, ymin = .lower, ymax = .upper, group = event, fill = event), alpha = 0.3) +
+    geom_line(data = filter(doy_annual_avg_pp_sum, Site == "PGTIS"), aes(x = Year, y = DoY, colour = event)) +
+    scale_fill_discrete_c4a_div(palette = "icefire") +
+    scale_colour_discrete_c4a_div(palette = "icefire") +
+    theme_bw(base_size = 8) +
+    xlab("Year") +
+    ylab("Date") +
+    ggtitle("PGTIS", subtitle = "1961-1990 normal MAT: 3.9 \u00B0C") +
+    facet_grid(Sex ~ MAT_label) +
+    scale_y_continuous(
+        breaks = seq(1, 365, by = 14),  # Breaks every 2 weeks
+        labels = format(seq(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "2 weeks"), "%b %d")) +
+    theme(
+        axis.text.y = element_text(size = 8),
+        strip.text.y = element_text(size = 9),
+        legend.position = "bottom"
+    )
+
+kalorch <- ggplot() +
+    geom_line(data = filter(phenf_orchplot, Site == "Kalamalka"), aes(x = Year, y = DoY, group = Year), alpha = 0.9) +
+    geom_ribbon(data = filter(doy_annual_avg_pp_sum, Site == "Kalamalka"), aes(x = Year, ymin = .lower, ymax = .upper, group = event, fill = event), alpha = 0.3) +
+    geom_line(data = filter(doy_annual_avg_pp_sum, Site == "Kalamalka"), aes(x = Year, y = DoY, colour = event)) +
+    scale_fill_discrete_c4a_div(palette = "icefire") +
+    scale_colour_discrete_c4a_div(palette = "icefire") +
+    theme_bw(base_size = 8) +
+    xlab("Year") +
+    ylab("Date") +
+    ggtitle("Kalamalka", subtitle = "1961-1990 normal MAT: 8.0 \u00B0C") +
+    facet_grid(Sex ~ MAT_label) +
+    scale_y_continuous(
+        breaks = seq(1, 365, by = 14),  # Breaks every 2 weeks
+        labels = format(seq(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "2 weeks"), "%b %d")) +
+    theme(
+        axis.text.y = element_text(size = 8),
+        strip.text.y = element_text(size = 9),
+        legend.position = "bottom"
+    )
+
+kalorch / pgtisorch +
+    plot_annotation(tag_levels = 'A') +
+    plot_layout(guides = "collect") &
+    theme(legend.position = "bottom")
+
+ggsave(here::here("output/figures/orchpred_doy.png"), width = 6, height = 7)
 # profdiffs ####
 # differences between provenances in flowering at different sites #mean difference between coldest and warmest provenance
 warmvscold <- readRDS(here::here('output/warmvscold.rds'))
