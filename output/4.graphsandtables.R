@@ -635,7 +635,7 @@ doy_to_date <- function(doy) {
   return(date_labels)
 }
 
-ggplot(filter(doy_normal_plotting, event == "begin"), aes(x = period, y = DoY, colour = Sex, shape = Sex)) +
+ggplot(filter(doy_normal_plotting, event == "begin"), aes(x = period, y = DoY, colour = Sex, shape = event)) +
   stat_pointinterval(position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
   stat_pointinterval(data = filter(doy_normal_plotting, event == "end"), position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
   facet_grid(scenario ~ MATlabel, labeller = labeller(scenario = c(ssp245 = "SSP2 4.5 W/m²", ssp585 = "SSP5 8.5 W/m²"))) +
@@ -646,7 +646,8 @@ ggplot(filter(doy_normal_plotting, event == "begin"), aes(x = period, y = DoY, c
         axis.text.x = element_text(angle = 45, hjust=1),
         axis.title.x = element_text(vjust = -1)) +
   ylab(NULL) +
-  xlab("Normal period")
+  xlab("Normal period") +
+    guides(shape = guide_legend(override.aes = list(size = 3)))
 
 ggsave(here::here("output/figures/normal_predictions.png"), width = 9, height = 6, units = "in")
 
