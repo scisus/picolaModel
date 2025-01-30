@@ -5,3 +5,4 @@
 - `thermaltimemodel.R` Thermal time models of flowering events in Stan
   - Generated Stan code in `stan_output/[sex]_[event].stan`
   - Model output in `stan_output/[sex]_[event].rds`
+- `fit_model.R`: run models from the command line with fixed seeds used in publication, new random seeds, or simply download existing model fit from zenodo. Permits multiple runs of each model.
