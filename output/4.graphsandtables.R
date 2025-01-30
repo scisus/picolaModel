@@ -362,7 +362,10 @@ ggplot(overlapex, aes(x = mean, y = forcats::fct_rev(label), xmin = .lower, xmax
   geom_pointinterval(size = 5, linewidth = 3) +
   ylab("") +
   facet_grid(forcats::fct_rev(data) ~ ., scales = "free_y") +
-  scale_color_manual(values = c("TRUE" = "#1B9E77", "FALSE" = "#D95F02")) +
+    scale_color_manual(
+        values = c("TRUE" = "#1B9E77", "FALSE" = "#D95F02", "NA" = "grey"),
+        breaks = c("TRUE", "FALSE") # Removes "NA" from legend
+    ) +
   geom_vline(xintercept = c(5,15), colour = "grey", linetype = 2) +
   theme_bw(base_size = 12) +
   theme(legend.position = "bottom") +
