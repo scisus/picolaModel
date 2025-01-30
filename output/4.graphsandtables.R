@@ -636,17 +636,17 @@ doy_to_date <- function(doy) {
 }
 
 ggplot(filter(doy_normal_plotting, event == "begin"), aes(x = period, y = DoY, colour = Sex, shape = event)) +
-  stat_pointinterval(position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
-  stat_pointinterval(data = filter(doy_normal_plotting, event == "end"), position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
-  facet_grid(scenario ~ MATlabel, labeller = labeller(scenario = c(ssp245 = "SSP2 4.5 W/m²", ssp585 = "SSP5 8.5 W/m²"))) +
-  scale_colour_discrete_c4a_div(palette = "acadia") +
-  scale_y_continuous(labels = doy_to_date, breaks = seq(100, 200, by = 14)) +
-  theme_bw() +
-  theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 45, hjust=1),
-        axis.title.x = element_text(vjust = -1)) +
-  ylab(NULL) +
-  xlab("Normal period") +
+    stat_pointinterval(position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
+    stat_pointinterval(data = filter(doy_normal_plotting, event == "end"), position = position_dodge(width = 1), alpha = 0.5, .width = c(0.50, 0.95)) +
+    facet_grid(scenario ~ MATlabel, labeller = labeller(scenario = c(ssp245 = "SSP2 4.5 W/m²", ssp585 = "SSP5 8.5 W/m²"))) +
+    scale_colour_discrete_c4a_div(palette = "acadia") +
+    scale_y_continuous(labels = doy_to_date, breaks = seq(100, 200, by = 14)) +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          axis.text.x = element_text(angle = 45, hjust=1),
+          axis.title.x = element_text(vjust = -1)) +
+    ylab(NULL) +
+    xlab("Normal period") +
     guides(shape = guide_legend(override.aes = list(size = 3)))
 
 ggsave(here::here("output/figures/normal_predictions.png"), width = 9, height = 6, units = "in")
