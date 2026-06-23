@@ -400,8 +400,6 @@ ggplot(fpred_orch_avg_summary) +
   )
 ggsave(here::here("output/figures/genpred_gdd.png"), width = 6, height = 4)
 
-
-
 # DoY
 
 doy_annual_avg_pp_sum <- readRDS(here::here("tmp/doy_annual_avg_pp_sum.rds")) %>%
