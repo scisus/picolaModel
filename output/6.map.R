@@ -63,19 +63,23 @@ parents <- picolaDataFlowering::picola_parent_locs %>%
     filter(Genotype %in% genotypes$Genotype) %>%
     st_as_sf(coords = c("lon", "lat"), crs = 4326, agr = "constant")
 
+# orchard climate
+sitedat <- readRDS(here::here("output/tables/sitedat.rds"))
+
 # orchard locations
-sitedat <- picolaDataFlowering::picola_site_coord_elev
+sitelocs <- picolaDataFlowering::picola_site_coord_elev %>%
+    left_join(sitedat)
 
 # 4 sites are very close together. create different dfs for mapping labels at different map scales
-sitezoomout <- sitedat %>%
+sitezoomout <- sitelocs %>%
   filter(!Site %in% c("Vernon","Tolko","PRT", "Kalamalka")) %>%
   st_as_sf(coords = c("lon", "lat"), crs = 4326, agr = "constant")
 
-sitezoomin <- sitedat %>%
+sitezoomin <- sitelocs %>%
   filter(Site %in% c("Vernon","Tolko","PRT", "Kalamalka")) %>%
   st_as_sf(coords = c("lon", "lat"), crs = 4326, agr = "constant")
 
-sites <- sitedat %>%
+sites <- sitelocs %>%
   st_as_sf(coords = c("lon", "lat"), crs = 4326, agr = "constant")
 
 # bboxes ##########
@@ -107,7 +111,9 @@ bboxsitezoom <- sites %>%
 
 basemap <- ggplot(data = basedat) +
   geom_raster(data = elevations, aes(x = x, y = y, fill = elevation)) +
-  scale_fill_gradientn(colours = grey.colors(20, end = 0.8), na.value = NA) +
+  scale_fill_gradientn(colours = grey.colors(20, end = 0.8),
+                       na.value = NA,
+                       guide = 'none') +
   geom_sf(data = pcontorta, alpha = 0.2, fill = "darkolivegreen3") +
   geom_sf(fill = NA) +
   annotation_north_arrow(location = "bl", which_north = "true", # location set to "tl"
@@ -121,19 +127,95 @@ basemap <- ggplot(data = basedat) +
 
 print(basemap)
 
+# custom legends
+sites_legend <- sites %>%
+    mutate(point_type = if_else(orchard, "orchard site", "non-orchard site"))
+
+parents_legend <- parents %>%
+    mutate(point_type = "parent tree origin")
+
 pointmap <- basemap +
-  geom_sf(data = sites, size = 2, aes(shape = orchard, color = orchard)) +
-  scale_shape_manual(values = c('FALSE' = 17, 'TRUE' = 16)) +
-  scale_colour_brewer(type = "qual", palette = "PuOr") +
-  geom_sf(data = parents, shape = 3, alpha = 0.8) +
-  coord_sf(xlim = c(bboxparents$xmin - 3e5, bboxparents$xmax + 2e5),
-           ylim = c(bboxsites$ymin - 1e5, bboxsites$ymax + 3e5)) +
-  geom_label_repel(data = sitezoomout, aes(label = Site, geometry = geometry),
-                   stat = "sf_coordinates", nudge_x = 5e5) +
-  geom_label_repel(data = sitezoomin, aes(label = Site, geometry = geometry),
-                   stat = "sf_coordinates", nudge_x = -5e5, nudge_y = 5e4)
+    geom_sf(
+        data = sites_legend,
+        aes(shape = point_type, colour = point_type),
+        size = 2.4
+    ) +
+    geom_sf(
+        data = parents_legend,
+        aes(shape = point_type, colour = point_type),
+        size = 1.8,
+        alpha = 0.8
+    ) +
+    scale_shape_manual(
+        name = NULL,
+        breaks = c("parent tree origin", "orchard site", "non-orchard site"),
+        values = c(
+            "parent tree origin" = 3,
+            "orchard site" = 16,
+            "non-orchard site" = 17
+        )
+    ) +
+    scale_colour_manual(
+        name = NULL,
+        breaks = c("parent tree origin", "orchard site", "non-orchard site"),
+        values = c(
+            "parent tree origin" = "black",
+            "orchard site" = "#F7F7F7",
+            "non-orchard site" = "#F1A340"
+        )
+    ) +
+
+    coord_sf(
+        xlim = xlim_map,
+        ylim = ylim_map
+    ) +
+
+    # site labels for zoomed-out sites
+    geom_label_repel(
+        data = sitezoomout,
+        aes(label = Site, geometry = geometry),
+        stat = "sf_coordinates",
+        nudge_x = 5e5,
+        seed = 1,
+        fill = "white",
+        colour = "black",
+        label.size = 0.25,
+        label.padding = grid::unit(0.22, "lines"),
+        box.padding = 0.15,
+        point.padding = 0.1,
+        min.segment.length = 0
+    ) +
+
+    # site labels for zoomed-in sites
+    geom_label_repel(
+        data = sitezoomin,
+        aes(label = Site, geometry = geometry),
+        stat = "sf_coordinates",
+        nudge_x = -5e5,
+        nudge_y = 5e4,
+        seed = 1,
+        fill = "white",
+        colour = "black",
+        label.size = 0.25,
+        label.padding = grid::unit(0.18, "lines"),
+        box.padding = 0.15,
+        point.padding = 0.1,
+        min.segment.length = 0
+    ) +
+
+    theme(
+        legend.position = "inside",
+        legend.position.inside = c(0.025, 0.8),
+        legend.justification = c(0, 0),
+        legend.background = element_rect(
+            fill = "white",
+            colour = "grey40",
+            linewidth = 0.3
+        ),
+        legend.key = element_rect(fill = "grey92", colour = NA),
+        legend.text = element_text(size = 9)
+    )
 
 print(pointmap)
-
 # Save the plot
 ggsave(filename = here::here("output/figures/siteandparentmap.png"), plot = pointmap, width = 7, height = 7, dpi = 300, units = "in")
