@@ -88,140 +88,57 @@ siteclimplot <- meantempplot / forcplot / sumforcplot +
 siteclimplot
 ggsave(here::here("output/figures/siteclimplot.png"), width = 5, height = 7.5)
 
-# map inset ####
+## mat plot to combine with map in 6.map.R
+site_x <- 0.84
 
-# genotypes, years, MAT
-sitegenotypes <- readRDS(here::here("output/phenf.rds")) %>%
-    select(Site, Year, Genotype) %>%
-    distinct() %>%
-    group_by(Site) %>%
-    summarise(nGenotypes = n_distinct(Genotype),
-              nYears = n_distinct(Year),
-              .groups = "drop")
-
-datasummary <- dplyr::filter(typical_year_forc, DoY == 150) %>%
-    left_join(sitedat) %>%
-    left_join(sitegenotypes) %>%
-    mutate(
-        nYears_bin = case_when(
-            nYears == 1 ~ "1",
-            nYears %in% 2:4 ~ "2–4",
-            nYears == 16 ~ "16",
-            TRUE ~ NA_character_
-        ),
-        nYears_bin = factor(nYears_bin, levels = c("1", "2–4", "16"))
-    )
-
-datasummary_orchard <- datasummary %>%
-    filter(Site_type == "orchard")
-
-datasummary_comparison <- datasummary %>%
-    filter(Site_type == "comparison")
-
-ggplot(datasummary, aes(x = MAT, y = sum_forcing)) +
+sitematplot <- ggplot() +
     geom_point(
-        data = datasummary_orchard,
-        aes(
-            size = nGenotypes,
-            fill = nYears_bin,
-            shape = Site_type
-        ),
+        data = filter(sites, `Site Type` == "Seed Orchard"),
+        aes(x = site_x, y = MAT),
+        shape = 21,
+        size = 3,
         colour = "black",
-        alpha = 0.9,
-        stroke = 0.7
+        fill = "white",
+        stroke = 0.8
     ) +
     geom_point(
-        data = datasummary_comparison,
-        aes(shape = Site_type),
-        size = 4,
-        stroke = 1.2,
-        colour = "black") +
+        data = filter(sites, `Site Type` == "Comparison"),
+        aes(x = site_x, y = MAT),
+        shape = 17,
+        size = 3.5,
+        colour = "#F1A340"
+    ) +
     geom_text_repel(
-        aes(label = Site),
-        direction = "x",
-        nudge_x = -0.7,
-        hjust = 1,
-        segment.colour = NA,
-        point.padding = unit(0.5, "lines"),
-        box.padding = unit(0.2, "lines"),
-        max.overlaps = Inf,
-        size = 3.5
+        data = sites,
+        aes(x = site_x, y = MAT, label = Site),
+        direction = "y",
+        nudge_x = 0.11,
+        hjust = 0,
+        size = 3.0,
+        point.padding = unit(0.2, "lines"),
+        box.padding = unit(0.25, "lines"),
+        min.segment.length = 0,
+        max.overlaps = Inf
     ) +
-    xlab("Mean Annual Temperature (°C)") +
-    ylab("Forcing accumulated by May 30") +
-    #so much guides
-    scale_shape_manual(
-        name = "Site type",
-        values = c(
-            "orchard" = 21,
-            "comparison" = 4
-        )
+    geom_vline(xintercept = site_x, linewidth = 0.3, colour = "grey70") +
+    scale_y_reverse(
+        limits = rev(range(sites$MAT, na.rm = TRUE) + c(-0.5, 0.5)),
+        breaks = seq(-2, 8, by = 2)
     ) +
-    scale_size_continuous(
-        name = "Genotypes",
-        range = c(3, 12),
-        breaks = c(15, 30, 60)
-    ) +
-    scale_fill_viridis_d(
-        name = "Years",
-        option = "viridis",
-        limits = c("1", "2–4", "16"),
-        drop = FALSE,
-        na.translate = FALSE
-    ) +
-    guides(
-        shape = guide_legend(
-            order = 1,
-            nrow = 1,
-            override.aes = list(
-                shape = c(21, 4),
-                fill = c("white", NA),
-                colour = "black",
-                size = c(3.2, 3.2),
-                stroke = c(0.8, 1.2),
-                alpha = 1
-            )
-        ),
-        size = guide_legend(
-            order = 2,
-            nrow = 1,
-            override.aes = list(
-                shape = 21,
-                fill = "white",
-                colour = "black",
-                alpha = 1,
-                stroke = 0.8
-            )
-        ),
-        fill = guide_legend(
-            order = 3,
-            nrow = 1,
-            override.aes = list(
-                shape = 21,
-                size = 6,
-                colour = "black",
-                stroke = 0.8,
-                alpha = 1
-            )
-        )
-    ) +
+    coord_cartesian(xlim = c(0.72, 1.42), clip = "off") +
+    xlab(NULL) +
+    ylab("Mean annual temperature (°C)") +
     theme_bw() +
     theme(
-        legend.position = "inside",
-        legend.position.inside = c(0.02, 0.98),
-        legend.justification = c(0, 1),
-        legend.box = "vertical",
-        legend.direction = "horizontal",
-        legend.background = element_rect(
-            fill = scales::alpha("white", 0.85),
-            colour = "grey60",
-            linewidth = 0.3
-        ),
-        legend.key = element_rect(
-            fill = scales::alpha("white", 0),
-            colour = NA
-        )
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "none",
+        plot.margin = margin(5, 45, 5, 5)
     )
+
+
 
 ## monthlytemps - monthly climate normals ####
 

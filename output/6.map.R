@@ -13,6 +13,7 @@ library(ggspatial)
 library(terra)
 library(elevatr)
 library(ggrepel)
+library(patchwork)
 
 # NAD83 / Canada Atlas Lambert 3978
 # WGS 84 -- WGS84 - World Geodetic System 1984, used in GPS 4326
@@ -109,27 +110,138 @@ bboxsitezoom <- sites %>%
 # maps ###########
 
 
+# basemap <- ggplot(data = basedat) +
+#   geom_raster(data = elevations, aes(x = x, y = y, fill = elevation)) +
+#   scale_fill_gradientn(colours = grey.colors(20, end = 0.8),
+#                        na.value = NA,
+#                        guide = 'none') +
+#   geom_sf(data = pcontorta, alpha = 0.2, fill = "darkolivegreen3") +
+#   geom_sf(fill = NA) +
+#   annotation_north_arrow(location = "bl", which_north = "true", # location set to "tl"
+#                          pad_x = unit(0.05, "in"), pad_y = unit(0.05, "in"),
+#                          style = north_arrow_fancy_orienteering) +
+#   annotation_scale(location = "br", width_hint = 0.22) + # added scale bar
+#   coord_sf(xlim = c(bboxparents$xmin - 4e5, bboxparents$xmax + 1e5),
+#            ylim = c(bboxsites$ymin - 1e5, bboxsites$ymax + 3e5)) +
+#   theme(legend.position = "none") +
+#   ylab("") + xlab("")
+
 basemap <- ggplot(data = basedat) +
-  geom_raster(data = elevations, aes(x = x, y = y, fill = elevation)) +
-  scale_fill_gradientn(colours = grey.colors(20, end = 0.8),
-                       na.value = NA,
-                       guide = 'none') +
-  geom_sf(data = pcontorta, alpha = 0.2, fill = "darkolivegreen3") +
-  geom_sf(fill = NA) +
-  annotation_north_arrow(location = "bl", which_north = "true", # location set to "tl"
-                         pad_x = unit(0.05, "in"), pad_y = unit(0.05, "in"),
-                         style = north_arrow_fancy_orienteering) +
-  annotation_scale(location = "br", width_hint = 0.22) + # added scale bar
-  coord_sf(xlim = c(bboxparents$xmin - 4e5, bboxparents$xmax + 1e5),
-           ylim = c(bboxsites$ymin - 1e5, bboxsites$ymax + 3e5)) +
-  theme(legend.position = "none") +
-  ylab("") + xlab("")
+    geom_raster(data = elevations, aes(x = x, y = y, fill = elevation)) +
+    scale_fill_gradientn(
+        colours = grey.colors(20, end = 0.8),
+        na.value = NA,
+        guide = "none"
+    ) +
+    geom_sf(data = pcontorta, alpha = 0.2, fill = "darkolivegreen3") +
+    geom_sf(fill = NA) +
+    annotation_north_arrow(
+        location = "bl",
+        which_north = "true",
+        pad_x = unit(0.05, "in"),
+        pad_y = unit(0.05, "in"),
+        style = north_arrow_fancy_orienteering
+    ) +
+    annotation_scale(location = "br", width_hint = 0.22) +
+    coord_sf(
+        xlim = c(bboxparents$xmin - 4e5, bboxparents$xmax + 1e5),
+        ylim = c(bboxsites$ymin - 1e5, bboxsites$ymax + 3e5)
+    ) +
+    theme(legend.position = "none") +
+    ylab("") +
+    xlab("")
 
 print(basemap)
 
-# custom legends
+# # custom legends
+# sites_legend <- sites %>%
+#     mutate(point_type = if_else(orchard, "orchard site", "non-orchard site"))
+#
+# parents_legend <- parents %>%
+#     mutate(point_type = "parent tree origin")
+#
+# pointmap <- basemap +
+#     geom_sf(
+#         data = sites_legend,
+#         aes(shape = point_type, colour = point_type),
+#         size = 2.4
+#     ) +
+#     geom_sf(
+#         data = parents_legend,
+#         aes(shape = point_type, colour = point_type),
+#         size = 1.8,
+#         alpha = 0.8
+#     ) +
+#     scale_shape_manual(
+#         name = NULL,
+#         breaks = c("parent tree origin", "orchard site", "non-orchard site"),
+#         values = c(
+#             "parent tree origin" = 3,
+#             "orchard site" = 16,
+#             "non-orchard site" = 17
+#         )
+#     ) +
+#     scale_colour_manual(
+#         name = NULL,
+#         breaks = c("parent tree origin", "orchard site", "non-orchard site"),
+#         values = c(
+#             "parent tree origin" = "black",
+#             "orchard site" = "#F7F7F7",
+#             "non-orchard site" = "#F1A340"
+#         )
+#     ) +
+#
+#     coord_sf(
+#         xlim = xlim_map,
+#         ylim = ylim_map
+#     ) +
+#
+#     # site labels for zoomed-out sites
+#     geom_label_repel(
+#         data = sitezoomout,
+#         aes(label = Site, geometry = geometry),
+#         stat = "sf_coordinates",
+#         nudge_x = 5e5,
+#         seed = 1,
+#         fill = "white",
+#         colour = "black",
+#         label.size = 0.25,
+#         label.padding = grid::unit(0.22, "lines"),
+#         box.padding = 0.15,
+#         point.padding = 0.1,
+#         min.segment.length = 0
+#     ) +
+#
+#     # site labels for zoomed-in sites
+#     geom_label_repel(
+#         data = sitezoomin,
+#         aes(label = Site, geometry = geometry),
+#         stat = "sf_coordinates",
+#         nudge_x = -5e5,
+#         nudge_y = 5e4,
+#         seed = 1,
+#         fill = "white",
+#         colour = "black",
+#         label.size = 0.25,
+#         label.padding = grid::unit(0.18, "lines"),
+#         box.padding = 0.15,
+#         point.padding = 0.1,
+#         min.segment.length = 0
+#     ) +
+#     theme(
+#         legend.position = "bottom",
+#         legend.box = "horizontal",
+#         legend.direction = "horizontal",
+#         legend.background = element_blank(),
+#         legend.key = element_rect(fill = "white", colour = NA),
+#         legend.text = element_text(size = 9)
+#     )
+
+# custom legend labels
 sites_legend <- sites %>%
-    mutate(point_type = if_else(orchard, "orchard site", "non-orchard site"))
+    mutate(
+        point_type = if_else(orchard, "orchard site", "non-orchard site")
+    )
 
 parents_legend <- parents %>%
     mutate(point_type = "parent tree origin")
@@ -164,13 +276,10 @@ pointmap <- basemap +
             "non-orchard site" = "#F1A340"
         )
     ) +
-
     coord_sf(
-        xlim = xlim_map,
-        ylim = ylim_map
+        xlim = c(bboxparents$xmin - 3e5, bboxparents$xmax + 2e5),
+        ylim = c(bboxsites$ymin - 1e5, bboxsites$ymax + 3e5)
     ) +
-
-    # site labels for zoomed-out sites
     geom_label_repel(
         data = sitezoomout,
         aes(label = Site, geometry = geometry),
@@ -185,8 +294,6 @@ pointmap <- basemap +
         point.padding = 0.1,
         min.segment.length = 0
     ) +
-
-    # site labels for zoomed-in sites
     geom_label_repel(
         data = sitezoomin,
         aes(label = Site, geometry = geometry),
@@ -202,20 +309,32 @@ pointmap <- basemap +
         point.padding = 0.1,
         min.segment.length = 0
     ) +
-
-    theme(
-        legend.position = "inside",
-        legend.position.inside = c(0.025, 0.8),
-        legend.justification = c(0, 0),
-        legend.background = element_rect(
-            fill = "white",
-            colour = "grey40",
-            linewidth = 0.3
+    guides(
+        fill = "none",
+        shape = guide_legend(
+            nrow = 1,
+            override.aes = list(
+                size = c(1.8, 2.4, 2.4),
+                alpha = c(0.8, 1, 1)
+            )
         ),
-        legend.key = element_rect(fill = "grey92", colour = NA),
+        colour = guide_legend(
+            nrow = 1,
+            override.aes = list(
+                size = c(1.8, 2.4, 2.4),
+                alpha = c(0.8, 1, 1)
+            )
+        )
+    ) +
+    theme(
+        legend.position = "bottom",
+        legend.box = "horizontal",
+        legend.direction = "horizontal",
+        legend.background = element_blank(),
+        legend.key = element_rect(fill = "white", colour = NA),
         legend.text = element_text(size = 9)
     )
 
-print(pointmap)
+
 # Save the plot
 ggsave(filename = here::here("output/figures/siteandparentmap.png"), plot = pointmap, width = 7, height = 7, dpi = 300, units = "in")
